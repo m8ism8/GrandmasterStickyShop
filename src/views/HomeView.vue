@@ -17,13 +17,10 @@ const categories = ref([{ item: t('categories.all'), img: 'http://placehold.co/4
 onMounted(async () => {
   try {
     const [categoriesData] = await Promise.all([apiService.getCategories()])
-    categoriesData.map((cat) => console.log(getLocalizedName(cat)))
-
     categories.value = [
       categories.value[0],
       ...categoriesData.map((cat) => ({ item: getLocalizedName(cat), img: cat.image_url })),
     ]
-    console.log(categories)
   } catch (err) {
     error.value = t('shop.error')
     console.error('Error:', err)

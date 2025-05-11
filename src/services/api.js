@@ -15,7 +15,6 @@ export const apiService = {
             const response = await api.get('/products');
             return response.data;
         } catch (error) {
-            console.error('Error fetching products:', error);
             throw error;
         }
     },
@@ -23,10 +22,8 @@ export const apiService = {
     async getCategories() {
         try {
             const response = await api.get('/categories');
-            console.log('Raw categories response:', JSON.stringify(response.data, null, 2));
             return response.data;
         } catch (error) {
-            console.error('Error fetching categories:', error);
             throw error;
         }
     }

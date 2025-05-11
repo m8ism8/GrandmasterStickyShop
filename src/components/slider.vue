@@ -2,7 +2,6 @@
 import { Swiper, SwiperSlide } from 'swiper/vue'
 import { Navigation } from 'swiper/modules'
 
-import { defineProps } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 const { t } = useI18n()
@@ -11,7 +10,6 @@ import 'swiper/css'
 import 'swiper/css/navigation'
 
 const props = defineProps(['items'])
-console.log(props)
 </script>
 
 <template>

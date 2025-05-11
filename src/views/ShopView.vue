@@ -15,16 +15,10 @@ const error = ref(null)
 
 onMounted(async () => {
   try {
-    const [categoriesData] = await Promise.all([
-      apiService.getCategories(),
-      // apiService.getProducts()
-    ])
-    // Debug log
-    console.log('Received categories:', categoriesData)
+    const [categoriesData] = await Promise.all([apiService.getCategories()])
     categories.value = [
       t('categories.all'),
       ...categoriesData.map((cat) => {
-        console.log('Category name_ru:', cat.name_ru)
         return getLocalizedName(cat)
       }),
     ]
