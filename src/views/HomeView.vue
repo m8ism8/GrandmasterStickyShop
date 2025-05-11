@@ -2,38 +2,42 @@
 import TheBanner from '../components/banner.vue'
 import TheSlider from '../components/slider.vue'
 
-import {ref} from 'vue'
+import { ref, onMounted } from 'vue'
+import { apiService } from '@/services/api'
+import { useI18n } from 'vue-i18n'
+import { useLocalizedData } from '@/composables/useLocalizedData'
 
+const { t } = useI18n()
+const { getLocalizedName } = useLocalizedData()
 
-const items = ref(
-  [{
-    item: 'Smartphones and Accesories',
-    img: 'https://placehold.co/200x200'
-  },{
-    item: 'Smartphones and Accesories',
-    img: 'https://placehold.co/200x200'
-  },{
-    item: 'Smartphones and Accesories',
-    img: 'https://placehold.co/200x200'
-  },{
-    item: 'Smartphones and Accesories',
-    img: 'https://placehold.co/200x200'
-  },{
-    item: 'Smartphones and Accesories',
-    img: 'https://placehold.co/200x200'
-  },{
-    item: 'Smartphones and Accesories',
-    img: 'https://placehold.co/200x200'
-  }]
-)
+const loading = ref(true)
+const error = ref(null)
+
+const categories = ref([{ item: t('categories.all'), img: 'http://placehold.co/400x300' }])
+onMounted(async () => {
+  try {
+    const [categoriesData] = await Promise.all([apiService.getCategories()])
+    categoriesData.map((cat) => console.log(getLocalizedName(cat)))
+
+    categories.value = [
+      categories.value[0],
+      ...categoriesData.map((cat) => ({ item: getLocalizedName(cat), img: cat.image_url })),
+    ]
+    console.log(categories)
+  } catch (err) {
+    error.value = t('shop.error')
+    console.error('Error:', err)
+  } finally {
+    loading.value = false
+  }
+})
 </script>
 
-<style lang="scss">
-</style>
+<style lang="scss"></style>
 
 <template>
   <main>
-    <TheBanner/>
-    <TheSlider :items="items"/>
+    <TheBanner />
+    <TheSlider :items="categories" />
   </main>
 </template>
