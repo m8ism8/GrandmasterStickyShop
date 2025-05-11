@@ -1,9 +1,12 @@
 <script setup>
-// import TheWelcome from '../components/TheWelcome.vue'
+import TheBanner from '../components/banner.vue'
 </script>
+
+<style scoped lang="scss">
+</style>
 
 <template>
   <main>
-    
+    <TheBanner/>
   </main>
 </template>
