@@ -24,7 +24,6 @@ function handleImgError(e) {
       <h3 class="product-name">{{ product.name }}</h3>
       <div class="product-price-row">
         <span class="product-price">{{ t('product.price', { price: product.price }) }}</span>
-        <button class="buy-button">{{ t('product.buy') }}</button>
       </div>
     </div>
   </div>
@@ -68,22 +67,6 @@ function handleImgError(e) {
         font-size: 20px;
         font-weight: bold;
         color: #2c3e50;
-      }
-
-      .buy-button {
-        background: #27ae60;
-        color: #fff;
-        border: none;
-        padding: 8px 16px;
-        border-radius: 4px;
-        font-size: 16px;
-        cursor: pointer;
-        transition: filter 0.2s;
-        font-weight: bold;
-
-        &:hover {
-          filter: brightness(1.08);
-        }
       }
     }
   }

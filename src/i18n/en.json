@@ -29,5 +29,12 @@
   "banner": {
     "title": "Grandmaster Sticky Shop",
     "subtitle": "Superapp(lol no) was made by top1 peni parker and top 1 spiderman in kazakhstan. Galacta approved. Pls buy this Lomtadze"
+  },
+  "cart": {
+    "title": "Cart",
+    "empty": "Your cart is empty",
+    "add": "Add to cart",
+    "total": "Total",
+    "buy": "Buy"
   }
 }
