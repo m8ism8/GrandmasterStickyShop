@@ -34,7 +34,9 @@ async function register() {
       })
       // console.log('User registered:', response)
       localStorage.setItem('account', JSON.stringify(response))
-      router.push({ name: 'home' })
+      router.push('/').then(() => {
+        window.location.reload()
+      })
     } catch (e) {
       error.value = e.message
       console.error('Registration failed:', e.message)
@@ -47,7 +49,9 @@ async function login() {
       const userData = await apiService.login(username.value, password.value)
       // userData will contain { username: 'your_username', is_seller: true/false }
       localStorage.setItem('account', JSON.stringify(userData))
-      router.push({ name: 'home' })
+      router.push('/').then(() => {
+        window.location.reload()
+      })
     } catch (error) {
       console.error('Login failed:', error.message)
     }

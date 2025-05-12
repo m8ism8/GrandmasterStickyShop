@@ -140,3 +140,7 @@ a {
 a:hover {
   color: inherit;
 }
+
+body {
+  background: #f5f5f5;
+}

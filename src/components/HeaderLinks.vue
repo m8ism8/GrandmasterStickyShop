@@ -1,7 +1,7 @@
 <script setup>
 import { RouterLink } from 'vue-router'
 import { useI18n } from 'vue-i18n'
-import { ref, onMounted, onUnmounted, watch } from 'vue'
+import { ref } from 'vue'
 import { apiService } from '@/services/api'
 import { useRouter } from 'vue-router'
 
@@ -18,31 +18,12 @@ const toggleLocale = () => {
 const accountData = ref(JSON.parse(localStorage.getItem('account')))
 const isAuthorized = ref(!!localStorage.getItem('account'))
 
-// Watch for changes in localStorage
-const checkLocalStorage = () => {
-  const newAccountData = JSON.parse(localStorage.getItem('account'))
-  if (JSON.stringify(newAccountData) !== JSON.stringify(accountData.value)) {
-    location.reload()
-  }
-}
-
-// Set up an interval to check localStorage
-let intervalId
-
-onMounted(() => {
-  // Check every 100ms
-  intervalId = setInterval(checkLocalStorage, 10)
-})
-
-onUnmounted(() => {
-  // Clear the interval when component is unmounted
-  clearInterval(intervalId)
-})
-
 async function handleLogout() {
   try {
     await apiService.logout()
-    router.push('/login')
+    router.push('/').then(() => {
+      window.location.reload()
+    })
   } catch (err) {
     console.error('Error logging out:', err)
   }

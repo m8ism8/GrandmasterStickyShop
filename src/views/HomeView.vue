@@ -13,14 +13,11 @@ const { getLocalizedName } = useLocalizedData()
 const loading = ref(true)
 const error = ref(null)
 
-const categories = ref([{ item: t('categories.all'), img: 'http://placehold.co/400x300' }])
+const categories = ref([])
 onMounted(async () => {
   try {
     const [categoriesData] = await Promise.all([apiService.getCategories()])
-    categories.value = [
-      categories.value[0],
-      ...categoriesData.map((cat) => ({ item: getLocalizedName(cat), img: cat.image_url })),
-    ]
+    categories.value = categoriesData.map((cat) => ({ item: getLocalizedName(cat), img: cat.image_url }))
   } catch (err) {
     error.value = t('shop.error')
     console.error('Error:', err)
