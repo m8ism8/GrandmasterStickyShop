@@ -12,6 +12,11 @@ const categories = ref([])
 const loading = ref(true)
 const error = ref(null)
 
+const boughtOrders = ref([])
+const sellerOrders = ref([])
+const ordersLoading = ref(true)
+const ordersError = ref(null)
+
 // Product form data
 const productName = ref('')
 const productPrice = ref('')
@@ -32,11 +37,18 @@ onMounted(async () => {
   try {
     const categoriesData = await apiService.getCategories()
     categories.value = categoriesData
+    // Fetch orders
+    boughtOrders.value = await apiService.getMyOrders()
+    if (userData.value.is_seller) {
+      sellerOrders.value = await apiService.getOrdersForMyProducts()
+    }
   } catch (err) {
     error.value = t('shop.error')
+    ordersError.value = t('shop.error')
     console.error('Error:', err)
   } finally {
     loading.value = false
+    ordersLoading.value = false
   }
 })
 
@@ -132,6 +144,31 @@ async function createProduct() {
     text-align: center;
   }
 }
+
+.orders {
+  margin: 40px auto;
+  max-width: 700px;
+  h2 {
+    margin-top: 32px;
+    font-size: 28px;
+    color: #2c3e50;
+  }
+  .order-block {
+    background: #f8f8f8;
+    border-radius: 8px;
+    margin: 18px 0;
+    padding: 18px 24px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    ul {
+      margin: 10px 0 0 0;
+      padding: 0 0 0 18px;
+    }
+    li {
+      font-size: 18px;
+      margin-bottom: 4px;
+    }
+  }
+}
 </style>
 
 <template>
@@ -145,7 +182,37 @@ async function createProduct() {
     <CreateProductForm v-if="userData.is_seller" :categories="categories" />
 
     <div class="orders">
-      <div class="order"></div>
+      <h2>My Purchases</h2>
+      <div v-if="ordersLoading">Loading orders...</div>
+      <div v-else-if="ordersError">{{ ordersError }}</div>
+      <div v-else-if="!boughtOrders.length">No orders found.</div>
+      <div v-else>
+        <div v-for="order in boughtOrders" :key="order.id" class="order-block">
+          <div><b>Order #{{ order.id }}</b> ({{ new Date(order.created_at).toLocaleString() }})</div>
+          <ul>
+            <li v-for="product in order.products" :key="product.id">
+              {{ product.name }} x{{ product.amount }} (Seller: {{ product.seller_id }})
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <div v-if="userData.is_seller">
+        <h2>Orders for My Products</h2>
+        <div v-if="ordersLoading">Loading orders...</div>
+        <div v-else-if="ordersError">{{ ordersError }}</div>
+        <div v-else-if="!sellerOrders.length">No orders for your products.</div>
+        <div v-else>
+          <div v-for="order in sellerOrders" :key="order.id" class="order-block">
+            <div><b>Order #{{ order.id }}</b> ({{ new Date(order.created_at).toLocaleString() }})</div>
+            <ul>
+              <li v-for="product in order.products" :key="product.id">
+                {{ product.name }} x{{ product.amount }} (Buyer: {{ order.buyer_username || '?' }})
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </template>

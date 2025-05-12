@@ -126,5 +126,23 @@ export const apiService = {
             }
             throw error;
         }
+    },
+
+    async getMyOrders() {
+        try {
+            const response = await api.get('/orders/mine');
+            return response.data;
+        } catch (error) {
+            throw error;
+        }
+    },
+
+    async getOrdersForMyProducts() {
+        try {
+            const response = await api.get('/orders/for-my-products');
+            return response.data;
+        } catch (error) {
+            throw error;
+        }
     }
 }; 
