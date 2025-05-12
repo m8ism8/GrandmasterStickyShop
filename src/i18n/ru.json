@@ -17,9 +17,14 @@
     "pharmacy": "Аптека"
   },
   "shop": {
+    "title": "Магазин",
     "loading": "Загрузка товаров...",
     "error": "Не удалось загрузить данные",
     "price": "{price} тенге"
+  },
+  "product": {
+    "buy": "Купить",
+    "price": "${price}"
   },
   "banner": {
     "title": "Grandmaster Sticky Shop",

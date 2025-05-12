@@ -17,9 +17,14 @@
     "pharmacy": "Pharmacy"
   },
   "shop": {
+    "title": "Shop",
     "loading": "Loading products...",
     "error": "Failed to load data",
     "price": "{price} tenge"
+  },
+  "product": {
+    "buy": "Buy",
+    "price": "${price}"
   },
   "banner": {
     "title": "Grandmaster Sticky Shop",

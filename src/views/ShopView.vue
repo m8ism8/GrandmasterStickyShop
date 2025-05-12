@@ -1,34 +1,18 @@
 <script setup>
-import VueCategories from '@/components/shop/navigation.vue'
 import { ref, onMounted } from 'vue'
 import { apiService } from '@/services/api'
 import { useI18n } from 'vue-i18n'
-import { useLocalizedData } from '@/composables/useLocalizedData'
+import ProductCard from '@/components/product/ProductCard.vue'
 
 const { t } = useI18n()
-const { getLocalizedName } = useLocalizedData()
-
-const categories = ref([t('categories.all')])
-const products = ref([
-  {
-    name: 'Milk Lactel',
-    price: 1000,
-    img: 'http://placehold.co/200x200',
-  },
-])
+const products = ref([])
 const loading = ref(true)
 const error = ref(null)
 
 onMounted(async () => {
   try {
-    const [categoriesData] = await Promise.all([apiService.getCategories()])
-    categories.value = [
-      t('categories.all'),
-      ...categoriesData.map((cat) => {
-        return getLocalizedName(cat)
-      }),
-    ]
-    // products.value = productsData
+    const productsData = await apiService.getProducts()
+    products.value = productsData
   } catch (err) {
     error.value = t('shop.error')
     console.error('Error:', err)
@@ -39,64 +23,55 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="container">
-    <VueCategories :categories="categories" />
-
+  <div class="shop">
+    <h1>{{ t('shop.title') }}</h1>
+    
     <div v-if="loading" class="loading">
       {{ t('shop.loading') }}
     </div>
-
+    
     <div v-else-if="error" class="error">
-      {{ error }}
+      {{ t('shop.error') }}
     </div>
-
-    <div v-else class="shop">
-      <div v-for="product in products" :key="product.id" class="shop__card">
-        <img :src="product.image_url || 'http://placehold.co/200x150'" />
-        <p>{{ getLocalizedName(product) }}</p>
-        <p>{{ t('shop.price', { price: product.price }) }}</p>
-      </div>
+    
+    <div v-else class="products-grid">
+      <ProductCard
+        v-for="product in products"
+        :key="product.id"
+        :product="product"
+      />
     </div>
   </div>
 </template>
 
-<style lang="scss">
-.container {
-  .shop {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap: 1rem;
-    padding: 1rem;
+<style lang="scss" scoped>
+.shop {
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
 
-    &__card {
-      border: 1px solid #ddd;
-      border-radius: 8px;
-      padding: 1rem;
-      text-align: center;
-
-      img {
-        width: 100%;
-        height: 150px;
-        max-width: 200px;
-        object-fit: cover;
-        border-radius: 4px;
-      }
-
-      p {
-        margin: 0.5rem 0;
-      }
-    }
-  }
-
-  .loading,
-  .error {
+  h1 {
     text-align: center;
-    padding: 2rem;
-    font-size: 1.2rem;
+    margin-bottom: 40px;
+    font-size: 32px;
+    color: #2c3e50;
+  }
+
+  .loading, .error {
+    text-align: center;
+    font-size: 18px;
+    color: #666;
   }
 
   .error {
-    color: red;
+    color: #e74c3c;
+  }
+
+  .products-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 24px;
+    padding: 20px 0;
   }
 }
 </style>
