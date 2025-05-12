@@ -23,6 +23,22 @@ const toggleLocale = () => {
       </nav>
       <div>
         <a class="header__nav-link" @click="toggleLocale">{{ locale.toUpperCase() }}</a>
+        <RouterLink to="/login" class="header__nav-link" v-if="$route.name !== 'login'"
+          >Log in</RouterLink
+        >
+        <a
+          class="header__nav-link"
+          @click="$router.push({ query: { login: 'true' } })"
+          v-if="$route.name === 'login' && !$route.query.login"
+          >Login
+        </a>
+
+        <a
+          class="header__nav-link"
+          @click="$router.push({ query: {} })"
+          v-if="$route.name === 'login' && $route.query.login"
+          >Register
+        </a>
       </div>
     </div>
   </header>
