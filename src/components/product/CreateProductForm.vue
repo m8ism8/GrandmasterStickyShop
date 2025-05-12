@@ -1,44 +1,19 @@
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref } from 'vue'
 import { apiService } from '@/services/api'
-import { useI18n } from 'vue-i18n'
-import { useRouter } from 'vue-router'
-import CreateProductForm from '@/components/product/CreateProductForm.vue'
 
-const router = useRouter()
-const { t } = useI18n()
-const userData = ref(JSON.parse(localStorage.getItem('account')))
-const categories = ref([])
-const loading = ref(true)
-const error = ref(null)
+const props = defineProps({
+  categories: {
+    type: Array,
+    required: true
+  }
+})
 
-// Product form data
 const productName = ref('')
 const productPrice = ref('')
 const productImage = ref('')
 const productCategory = ref('')
 const productError = ref('')
-
-async function handleLogout() {
-  try {
-    await apiService.logout()
-    router.push('/login')
-  } catch (err) {
-    console.error('Error logging out:', err)
-  }
-}
-
-onMounted(async () => {
-  try {
-    const categoriesData = await apiService.getCategories()
-    categories.value = categoriesData
-  } catch (err) {
-    error.value = t('shop.error')
-    console.error('Error:', err)
-  } finally {
-    loading.value = false
-  }
-})
 
 async function createProduct() {
   if (!productName.value || !productPrice.value || !productCategory.value) {
@@ -71,16 +46,40 @@ async function createProduct() {
 }
 </script>
 
-<style lang="scss">
-.profile {
-  margin: 50px 0;
-  font-size: 48px;
-  text-align: center;
-  p {
-    font-size: 36px;
-  }
-}
+<template>
+  <div class="product-form">
+    <h2>Create New Product</h2>
+    <div class="form-group">
+      <label for="name">Product Name</label>
+      <input type="text" id="name" v-model="productName" placeholder="Enter product name" />
+    </div>
 
+    <div class="form-group">
+      <label for="price">Price</label>
+      <input type="number" id="price" v-model="productPrice" placeholder="Enter price" />
+    </div>
+
+    <div class="form-group">
+      <label for="image">Image URL</label>
+      <input type="text" id="image" v-model="productImage" placeholder="Enter image URL (optional)" />
+    </div>
+
+    <div class="form-group">
+      <label for="category">Category</label>
+      <select id="category" v-model="productCategory">
+        <option value="">Select a category</option>
+        <option v-for="category in categories" :key="category.id" :value="category.id">
+          {{ category.name_en }}
+        </option>
+      </select>
+    </div>
+
+    <button @click="createProduct">Create Product</button>
+    <p v-if="productError" class="error">{{ productError }}</p>
+  </div>
+</template>
+
+<style lang="scss">
 .product-form {
   max-width: 600px;
   margin: 30px auto;
@@ -132,20 +131,4 @@ async function createProduct() {
     text-align: center;
   }
 }
-</style>
-
-<template>
-  <div class="container">
-    <div class="profile">
-      Welcome home
-      <p>{{ userData.username }}</p>
-    </div>
-
-    <!-- Product Creation Form for Sellers -->
-    <CreateProductForm v-if="userData.is_seller" :categories="categories" />
-
-    <div class="orders">
-      <div class="order"></div>
-    </div>
-  </div>
-</template>
+</style> 
