@@ -1,6 +1,9 @@
 <script setup>
 import { ref } from 'vue'
 import { apiService } from '@/services/api'
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
 
 const username = ref('')
 const password = ref('')
@@ -30,6 +33,8 @@ async function register() {
         is_seller: isSeller.value,
       })
       // console.log('User registered:', response)
+      localStorage.setItem('account', JSON.stringify(response))
+      router.push({ name: 'home' })
     } catch (e) {
       error.value = e.message
       console.error('Registration failed:', e.message)
@@ -40,8 +45,9 @@ async function login() {
   if (errorCheck()) {
     try {
       const userData = await apiService.login(username.value, password.value)
-      console.log('Logged in user:', userData)
       // userData will contain { username: 'your_username', is_seller: true/false }
+      localStorage.setItem('account', JSON.stringify(userData))
+      router.push({ name: 'home' })
     } catch (error) {
       console.error('Login failed:', error.message)
     }

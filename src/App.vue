@@ -1,7 +1,7 @@
 <script setup>
 import { RouterLink, RouterView } from 'vue-router'
 import { useI18n } from 'vue-i18n'
-
+import { ref } from 'vue'
 const { t, locale } = useI18n()
 
 const toggleLocale = () => {
@@ -10,6 +10,8 @@ const toggleLocale = () => {
   localStorage.setItem('locale', newLocale)
   location.reload()
 }
+const accountData = ref(JSON.parse(localStorage.getItem('account')))
+const isAuthorized = ref(!!localStorage.getItem('account'))
 </script>
 
 <template>
@@ -23,9 +25,19 @@ const toggleLocale = () => {
       </nav>
       <div>
         <a class="header__nav-link" @click="toggleLocale">{{ locale.toUpperCase() }}</a>
-        <RouterLink to="/login" class="header__nav-link" v-if="$route.name !== 'login'"
-          >Log in</RouterLink
+        <RouterLink
+          to="/login"
+          class="header__nav-link"
+          v-if="$route.name !== 'login' && !isAuthorized"
+          >Authorize</RouterLink
         >
+        <RouterLink
+          to="/profile"
+          class="header__nav-link"
+          v-if="$route.name !== 'login' && isAuthorized"
+          >{{ accountData?.username }}</RouterLink
+        >
+
         <a
           class="header__nav-link"
           @click="$router.push({ query: { login: 'true' } })"
