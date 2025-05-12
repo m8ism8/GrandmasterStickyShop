@@ -2,6 +2,10 @@
 import { RouterLink, RouterView } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { ref } from 'vue'
+import { apiService } from '@/services/api'
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
 const { t, locale } = useI18n()
 
 const toggleLocale = () => {
@@ -10,8 +14,18 @@ const toggleLocale = () => {
   localStorage.setItem('locale', newLocale)
   location.reload()
 }
+
 const accountData = ref(JSON.parse(localStorage.getItem('account')))
 const isAuthorized = ref(!!localStorage.getItem('account'))
+
+async function handleLogout() {
+  try {
+    await apiService.logout()
+    router.push('/login')
+  } catch (err) {
+    console.error('Error logging out:', err)
+  }
+}
 </script>
 
 <template>
@@ -31,11 +45,11 @@ const isAuthorized = ref(!!localStorage.getItem('account'))
           v-if="$route.name !== 'login' && !isAuthorized"
           >Authorize</RouterLink
         >
-        <RouterLink
-          to="/profile"
+        <a
           class="header__nav-link"
+          @click="handleLogout"
           v-if="$route.name !== 'login' && isAuthorized"
-          >{{ accountData?.username }}</RouterLink
+          >Logout</a
         >
 
         <a
