@@ -114,5 +114,17 @@ export const apiService = {
             }
             throw error;
         }
+    },
+
+    async createOrder(products) {
+        try {
+            const response = await api.post('/orders', { products });
+            return response.data;
+        } catch (error) {
+            if (error.response?.status === 401) {
+                throw new Error('You must be logged in to place an order');
+            }
+            throw error;
+        }
     }
 }; 

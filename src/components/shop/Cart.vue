@@ -43,7 +43,6 @@ const total = computed(() =>
       <div class="cart-total">
         {{ t('cart.total') }}: <b>{{ t('product.price', { price: total }) }}</b>
       </div>
-      <button class="cart-buy">{{ t('cart.buy') }}</button>
     </div>
   </div>
 </template>
@@ -115,21 +114,6 @@ const total = computed(() =>
     margin-top: 24px;
     font-size: 20px;
     text-align: right;
-  }
-  .cart-buy {
-    margin-top: 24px;
-    width: 100%;
-    background: #27ae60;
-    color: #fff;
-    border: none;
-    border-radius: 4px;
-    font-size: 18px;
-    padding: 12px 0;
-    cursor: pointer;
-    font-weight: bold;
-    &:hover {
-      filter: brightness(1.08);
-    }
   }
 }
 </style> 

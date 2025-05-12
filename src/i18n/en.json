@@ -35,6 +35,8 @@
     "empty": "Your cart is empty",
     "add": "Add to cart",
     "total": "Total",
-    "buy": "Buy"
+    "buy": "Buy",
+    "buy_success": "Order placed successfully!",
+    "buy_error": "Failed to place order. Please try again."
   }
 }

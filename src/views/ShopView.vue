@@ -10,6 +10,8 @@ const products = ref([])
 const loading = ref(true)
 const error = ref(null)
 const cart = ref([])
+const orderSuccess = ref(false)
+const orderError = ref(null)
 
 onMounted(async () => {
   try {
@@ -43,6 +45,25 @@ function decreaseQty(item) {
     cart.value = cart.value.filter(i => i.id !== item.id)
   }
 }
+
+async function handleBuy() {
+  orderSuccess.value = false
+  orderError.value = null
+  if (!cart.value.length) return
+  try {
+    const orderProducts = cart.value.map(item => ({
+      id: item.id,
+      name: item.name,
+      amount: item.quantity,
+      seller_id: item.owner_id
+    }))
+    await apiService.createOrder(orderProducts)
+    cart.value = []
+    orderSuccess.value = true
+  } catch (err) {
+    orderError.value = err.message || t('cart.buy_error')
+  }
+}
 </script>
 
 <template>
@@ -64,7 +85,12 @@ function decreaseQty(item) {
           <button class="add-to-cart" @click="addToCart(product)">{{ t('cart.add') }}</button>
         </div>
       </div>
-      <Cart :cart="cart" :onIncrease="increaseQty" :onDecrease="decreaseQty" />
+      <div class="cart-section">
+        <Cart :cart="cart" :onIncrease="increaseQty" :onDecrease="decreaseQty" />
+        <button class="cart-buy-main" @click="handleBuy" :disabled="!cart.length">{{ t('cart.buy') }}</button>
+        <div v-if="orderSuccess" class="order-success">{{ t('cart.buy_success') }}</div>
+        <div v-if="orderError" class="order-error">{{ orderError }}</div>
+      </div>
     </div>
   </div>
 </template>
@@ -125,6 +151,47 @@ function decreaseQty(item) {
     &:hover {
       filter: brightness(1.08);
     }
+  }
+
+  .cart-section {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+    min-width: 320px;
+    max-width: 400px;
+    width: 100%;
+  }
+
+  .cart-buy-main {
+    background: #27ae60;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    font-size: 18px;
+    padding: 12px 0;
+    cursor: pointer;
+    font-weight: bold;
+    margin-top: 8px;
+    &:hover:enabled {
+      filter: brightness(1.08);
+    }
+    &:disabled {
+      background: #aaa;
+      cursor: not-allowed;
+    }
+  }
+  .order-success {
+    color: #27ae60;
+    text-align: center;
+    font-weight: bold;
+    margin-top: 8px;
+  }
+  .order-error {
+    color: #e74c3c;
+    text-align: center;
+    font-weight: bold;
+    margin-top: 8px;
   }
 }
 </style>
