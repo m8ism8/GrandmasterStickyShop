@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { apiService } from '@/services/api'
 import { useI18n } from 'vue-i18n'
 import ProductCard from '@/components/product/ProductCard.vue'
@@ -7,6 +7,8 @@ import Cart from '@/components/shop/Cart.vue'
 
 const { t } = useI18n()
 const products = ref([])
+const categories = ref([])
+const selectedCategory = ref('')
 const loading = ref(true)
 const error = ref(null)
 const cart = ref([])
@@ -15,8 +17,12 @@ const orderError = ref(null)
 
 onMounted(async () => {
   try {
-    const productsData = await apiService.getProducts()
+    const [productsData, categoriesData] = await Promise.all([
+      apiService.getProducts(),
+      apiService.getCategories(),
+    ])
     products.value = productsData
+    categories.value = categoriesData
   } catch (err) {
     error.value = t('shop.error')
     console.error('Error:', err)
@@ -25,8 +31,17 @@ onMounted(async () => {
   }
 })
 
+const filteredProducts = computed(() => {
+  if (!selectedCategory.value) return products.value
+  return products.value.filter((p) => p.category_id === parseInt(selectedCategory.value))
+})
+
+function selectCategory(id) {
+  selectedCategory.value = id
+}
+
 function addToCart(product) {
-  const found = cart.value.find(item => item.id === product.id)
+  const found = cart.value.find((item) => item.id === product.id)
   if (found) {
     found.quantity++
   } else {
@@ -42,7 +57,7 @@ function decreaseQty(item) {
   if (item.quantity > 1) {
     item.quantity--
   } else {
-    cart.value = cart.value.filter(i => i.id !== item.id)
+    cart.value = cart.value.filter((i) => i.id !== item.id)
   }
 }
 
@@ -51,11 +66,11 @@ async function handleBuy() {
   orderError.value = null
   if (!cart.value.length) return
   try {
-    const orderProducts = cart.value.map(item => ({
+    const orderProducts = cart.value.map((item) => ({
       id: item.id,
       name: item.name,
       amount: item.quantity,
-      seller_id: item.owner_id
+      seller_id: item.owner_id,
     }))
     await apiService.createOrder(orderProducts)
     cart.value = []
@@ -69,25 +84,37 @@ async function handleBuy() {
 <template>
   <div class="shop">
     <h1>{{ t('shop.title') }}</h1>
-    
+    <div class="shop-filter-buttons">
+      <button :class="['category-btn', { active: !selectedCategory }]" @click="selectCategory('')">
+        {{ t('categories.all') }}
+      </button>
+      <button
+        v-for="cat in categories"
+        :key="cat.id"
+        :class="['category-btn', { active: selectedCategory == cat.id }]"
+        @click="selectCategory(cat.id)"
+      >
+        {{ cat.name_en }}
+      </button>
+    </div>
     <div v-if="loading" class="loading">
       {{ t('shop.loading') }}
     </div>
-    
     <div v-else-if="error" class="error">
       {{ t('shop.error') }}
     </div>
-    
     <div v-else class="shop-content">
       <div class="products-grid">
-        <div v-for="product in products" :key="product.id" class="product-card-wrapper">
+        <div v-for="product in filteredProducts" :key="product.id" class="product-card-wrapper">
           <ProductCard :product="product" />
           <button class="add-to-cart" @click="addToCart(product)">{{ t('cart.add') }}</button>
         </div>
       </div>
       <div class="cart-section">
         <Cart :cart="cart" :onIncrease="increaseQty" :onDecrease="decreaseQty" />
-        <button class="cart-buy-main" @click="handleBuy" :disabled="!cart.length">{{ t('cart.buy') }}</button>
+        <button class="cart-buy-main" @click="handleBuy" :disabled="!cart.length">
+          {{ t('cart.buy') }}
+        </button>
         <div v-if="orderSuccess" class="order-success">{{ t('cart.buy_success') }}</div>
         <div v-if="orderError" class="order-error">{{ orderError }}</div>
       </div>
@@ -108,7 +135,39 @@ async function handleBuy() {
     color: #2c3e50;
   }
 
-  .loading, .error {
+  .shop-filter-buttons {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+    justify-content: center;
+    .category-btn {
+      background: #fcd92d;
+      border: none;
+      border-radius: 4px;
+      font-size: 16px;
+      padding: 8px 18px;
+      cursor: pointer;
+      font-weight: bold;
+      color: #000;
+      transition:
+        filter 0.2s,
+        background 0.2s,
+        color 0.2s;
+      outline: none;
+      box-shadow: none;
+      &.active {
+        background: #000;
+        color: #fff;
+      }
+      &:hover {
+        filter: brightness(1.08);
+      }
+    }
+  }
+
+  .loading,
+  .error {
     text-align: center;
     font-size: 18px;
     color: #666;
