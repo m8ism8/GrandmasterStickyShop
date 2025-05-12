@@ -9,7 +9,13 @@ const { t } = useI18n()
 const { getLocalizedName } = useLocalizedData()
 
 const categories = ref([t('categories.all')])
-const products = ref([])
+const products = ref([
+  {
+    name: 'Milk Lactel',
+    price: 1000,
+    img: 'http://placehold.co/200x200',
+  },
+])
 const loading = ref(true)
 const error = ref(null)
 
@@ -71,6 +77,7 @@ onMounted(async () => {
       img {
         width: 100%;
         height: 150px;
+        max-width: 200px;
         object-fit: cover;
         border-radius: 4px;
       }
